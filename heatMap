@@ -1,0 +1,44 @@
+'''
+@param string: input file name with '.xlsx' ending
+@author: Nimrod Shneor
+'''
+
+import numpy as np
+import matplotlib.pyplot as plt
+import xlrd
+import matplotlib.cm as cm
+
+class heatMap(object):
+   
+    def __init__(self,string):
+       
+        self.book = xlrd.open_workbook(string)
+        self.sh=self.book.sheet_by_index(0)
+        self.grain_size = []
+        self.data = []
+        
+    def graphBuild(self):
+        for i in xrange(1,len(self.sh.col(0))-1):
+            self.data.append([])
+            for j in xrange(1,len(self.sh.row(i))):
+                self.data[i-1].append(float(self.sh.cell_value(rowx=i,colx=j)))
+        j=1  
+        while j < len(self.sh.col(0))-1:
+            self.grain_size.append(float(self.sh.cell_value(rowx=j,colx=0)))
+            j=j+1
+        
+    def plotGraph(self):        
+        Labels = []
+        for i in xrange(1,len(self.sh.row(0))):
+            Labels.append(self.sh.cell_value(rowx=0,colx=i)) #setting labels        
+        np_data = np.array(self.data)
+        plt.pcolor(np.transpose(np_data) ,cmap=plt.cm.Blues)
+        plt.yticks(np.arange(len(Labels)),Labels)
+        plt.xticks(np.arange(0,len(self.grain_size),20), [0,10,100,1000])
+        for i in xrange(1,len(self.sh.row(0))):
+            plt.axhline(i,linestyle='-')
+     
+        plt.colorbar()
+        plt.show()
+
+        
